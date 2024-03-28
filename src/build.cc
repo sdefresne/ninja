@@ -798,9 +798,9 @@ bool Builder::FinishCommand(CommandRunner::Result* result, string* err) {
       // (existing) non-order-only input or the depfile.
       for (vector<Node*>::iterator i = edge->inputs_.begin();
            i != edge->inputs_.end() - edge->order_only_deps_; ++i) {
-        TimeStamp input_mtime = disk_interface_->Stat((*i)->path(), err);
-        if (input_mtime == -1)
+        if (!(*i)->StatIfNecessary(disk_interface_, err))
           return false;
+        TimeStamp input_mtime = (*i)->mtime();
         if (input_mtime > restat_mtime)
           restat_mtime = input_mtime;
       }
